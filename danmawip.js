@@ -435,31 +435,3 @@ function frame(now) {
 }
 
 requestAnimationFrame(frame);
-
-let spawnTimer = 0;
-let lastSpawn = performance.now();
-
-function spawnLoop(now) {
-    if (now - lastSpawn >= CONFIG.spawn.interval) {
-        lastSpawn = now;
-
-        const text =
-            samples[
-                Math.floor(Math.random() * samples.length)
-            ];
-
-        const r = Math.random();
-
-        if (r < 0.12) {
-            createComment(text, "top");
-        } else if (r < 0.24) {
-            createComment(text, "bottom");
-        } else {
-            createComment(text, "scroll");
-        }
-    }
-
-    requestAnimationFrame(spawnLoop);
-}
-
-requestAnimationFrame(spawnLoop);
