@@ -1,5 +1,6 @@
 const renderCache = new Map();
 
+
 function createSprite(text, fixed, color) {
     const metrics = getMetrics(text, fixed);
 
@@ -15,26 +16,25 @@ function createSprite(text, fixed, color) {
     const height =
         Math.ceil(glyphHeight + paddingY * 2);
 
-    const sprite = document.createElement("canvas");
+    const canvas =
+        new OffscreenCanvas(width, height);
 
-    sprite.width = width;
-    sprite.height = height;
+    const ctx =
+        canvas.getContext("2d");
 
-    const spriteCtx = sprite.getContext("2d");
+    ctx.font = metrics.font;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = color;
 
-    spriteCtx.font = metrics.font;
-    spriteCtx.textAlign = "left";
-    spriteCtx.textBaseline = "alphabetic";
-    spriteCtx.fillStyle = color;
-
-    spriteCtx.fillText(
+    ctx.fillText(
         text,
         paddingX,
         paddingY + metrics.ascent
     );
 
     return {
-        canvas: sprite,
+        canvas,
 
         width,
         height,
@@ -42,11 +42,9 @@ function createSprite(text, fixed, color) {
         glyphWidth,
         glyphHeight,
 
-        
         glyphX: paddingX,
         glyphY: paddingY,
 
-        
         anchorX:
             paddingX +
             glyphWidth / 2,
