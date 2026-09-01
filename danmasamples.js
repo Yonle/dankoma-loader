@@ -1,5 +1,5 @@
 const samples = [
-  // Original ones (kept for reference)
+
   "这是什么神仙操作",
   "太快了根本看不清",
   "这个真的很好笑",
@@ -21,7 +21,6 @@ const samples = [
   "好家伙",
   "这就是技术",
 
-  // New long and spammy ones
   "这个视频真的是太有意思了我已经看了五遍还是觉得超级搞笑",
   "哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈",
   "666666666666666666666666666666666666666666666666",
@@ -41,7 +40,6 @@ const samples = [
   "前排前排前排前排前排前排前排前排前排前排前排前排前排前排前排",
   "沙发沙发沙发沙发沙发沙发沙发沙发沙发沙发沙发沙发沙发沙发沙发",
 
-  // With ASCII emoticons and kaomoji (no Unicode emojis)
   ":) 太棒了",
   ";-P 完全没想到会这样",
   "XD 笑死我了",
@@ -62,7 +60,6 @@ const samples = [
   ":-O 惊讶",
   ":-| 平淡",
 
-  // Spam combinations
   "哈哈哈 XD 哈哈哈 XD 哈哈哈 XD 哈哈哈 XD",
   "23333 23333 23333 23333 23333 23333 23333",
   "666 666 666 666 666 666 666 666 666 666",
@@ -70,24 +67,20 @@ const samples = [
   "！！！！！！！！！！ O_O ！！！！！！！！！！",
   "?????????? ^_^ ??????????",
 
-  // Extremely long (over 100 characters)
   "这是一个超级无敌长的弹幕用来测试显示效果因为有些观众喜欢发很长的句子甚至可能包含重复内容或者无意义的填充比如这样一直写下去直到真的变得很长很长很长很长很长很长很长很长很长很长很长很长很长很长",
   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 
-  // Mixed spam
   "主播主播主播主播主播主播主播主播主播主播主播主播主播主播主播主播主播主播主播主播主播",
   "6666666 太强了 6666666 太强了 6666666 太强了 6666666",
   "哈哈哈哈哈 2333 哈哈哈哈哈 2333 哈哈哈哈哈 2333",
   "原来如此！原来如此！原来如此！原来如此！原来如此！",
   "绝了绝了绝了绝了绝了绝了绝了绝了绝了绝了绝了绝了绝了",
 
-  // Short but emoticon-heavy
   ":) :) :) :) :) :) :) :) :)",
   "XD XD XD XD XD XD XD XD",
   "^_^ ^_^ ^_^ ^_^ ^_^ ^_^ ^_^",
   "T_T T_T T_T T_T T_T T_T T_T",
 
-  // Others
   "这波操作我给满分",
   "再来一遍！",
   "泪目了兄弟们",
