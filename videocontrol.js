@@ -2,9 +2,40 @@ const playPause = document.getElementById("playPause");
 const seekbar = document.getElementById("seekbar");
 const volume = document.getElementById("volume");
 const settings = document.getElementById("settings");
+const fullscreen = document.getElementById("fullscreen");
+const canvasToggle = document.getElementById("canvasToggle");
+let controlsTimer = null;
 
-const canvasToggle =
-    document.getElementById("canvasToggle");
+function showControls() {
+    controls.classList.remove("hidden");
+
+    clearTimeout(controlsTimer);
+
+    controlsTimer = setTimeout(() => {
+        controls.classList.add("hidden");
+    }, 2500);
+}
+
+function hideControls() {
+    if (!video.paused) {
+        controls.classList.add("hidden");
+    }
+}
+
+video.addEventListener("mousemove", showControls);
+video.addEventListener("click", showControls);
+
+controls.addEventListener("mousemove", showControls);
+
+video.addEventListener("play", () => {
+    showControls();
+});
+
+video.addEventListener("pause", () => {
+    showControls();
+});
+
+showControls();
 
 canvasToggle.addEventListener("click", () => {
     drawEnabled = !drawEnabled;
@@ -57,6 +88,24 @@ volume.addEventListener("input", () => {
     video.volume = Number(volume.value);
 });
 
-settings.addEventListener("click", () => {
-    console.log("settings");
+fullscreen.addEventListener("click", async () => {
+    try {
+        if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+        } else {
+            await document.exitFullscreen();
+        }
+    } catch (err) {
+        console.error(
+            "fullscreen failed:",
+            err
+        );
+    }
+});
+
+document.addEventListener("fullscreenchange", () => {
+    fullscreen.textContent =
+        document.fullscreenElement
+            ? "⛶"
+            : "⛶";
 });

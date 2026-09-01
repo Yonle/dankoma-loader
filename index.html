@@ -212,6 +212,15 @@
       color: white;
   }
 
+  #controls {
+      transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  #controls.hidden {
+      opacity: 0;
+      transform: translateY(100%);
+      pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -241,14 +250,15 @@
     >
 
     <button id="settings" type="button">⚙</button>
+    <button id="fullscreen" type="button">⛶</button>
     <div id="settingsPopup" class="settings-popup" hidden>
-    <div class="settings-header">
-        <span>Settings</span>
-        <button id="settingsClose" type="button">×</button>
-    </div>
+      <div class="settings-header">
+          <span>Settings</span>
+          <button id="settingsClose" type="button">×</button>
+      </div>
 
-    <div id="settingsList" class="settings-list"></div>
-  </div>
+      <div id="settingsList" class="settings-list"></div>
+    </div>
 </div>
 
 <canvas id="danmaku"></canvas>
