@@ -101,7 +101,7 @@ const samples = [
 
 for (let i = 0; i < 10; i++) {
   samples.push(
-    "ぬ".repeat(100)
+    "ぬ".repeat(210)
   )
 }
 
