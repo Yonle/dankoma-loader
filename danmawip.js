@@ -2,7 +2,6 @@ const canvas = document.getElementById("danmaku");
 
 const ctx = canvas.getContext("2d", {
     alpha: true,
-    desynchronized: true
 });
 
 let W = 0;
@@ -609,11 +608,11 @@ let last =
     performance.now();
 
 function frame(now) {
-    const dt =
-        Math.min(
-            (now - last) / 1000,
-            0.05
-        );
+    if (!now) {
+        now = performance.now();
+    }
+
+    const dt = Math.max(0, Math.min((now - last) / 1000, 0.05));
 
     last = now;
 
