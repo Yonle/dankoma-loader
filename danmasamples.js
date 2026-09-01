@@ -105,18 +105,8 @@ for (let i = 0; i < 10; i++) {
   )
 }
 
-const colors = [
-  "#ffffff",
-  "#ffdc73",
-  "#7dd3fc",
-  "#fca5a5",
-  "#86efac",
-  "#c4b5fd",
-  "#f9a8d4"
-];
-
-function randomColor() {
-  return colors[Math.floor(Math.random() * colors.length)];
+function randomRGB888() {
+    return Math.floor(Math.random() * 0x1000000);
 }
 
 function spawnRandom() {
@@ -125,11 +115,13 @@ function spawnRandom() {
   const r = Math.random();
 
   if (r < 0.12) {
-    createComment(text, "top");
+    createComment(text, "top", randomRGB888());
   } else if (r < 0.24) {
-    createComment(text, "bottom");
+    createComment(text, "bottom", randomRGB888());
+  } else if (r < 0.44) {
+    createComment(text, "scroll", 16777215, 1);
   } else {
-    createComment(text, "scroll");
+    createComment(text, "scroll", 16777215, 0);
   }
 }
 

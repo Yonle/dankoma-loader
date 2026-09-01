@@ -192,69 +192,52 @@ function willScrollCollide(a, b) {
         return false;
     }
 
-    
-    const gap =
-        a.x -
-        (
-            b.x +
-            b.width +
-            CONFIG.scroll.gap
-        );
-
-    
-    if (gap <= 0) {
+    // Prevent head-on collisions between normal and reverse comments in the same lane
+    if ((a.vx > 0 && b.vx < 0) || (a.vx < 0 && b.vx > 0)) {
         return true;
     }
 
-    
-    if (a.vx <= b.vx) {
-        return false;
+    // 1. Right-to-Left Scrolling (vx > 0)
+    if (a.vx > 0) {
+        const gap = a.x - (b.x + b.width + CONFIG.scroll.gap);
+        if (gap <= 0) return true;
+        if (a.vx <= b.vx) return false;
+
+        const relativeSpeed = a.vx - b.vx;
+        return (gap / relativeSpeed) < CONFIG.scroll.lookahead;
     }
 
-    const relativeSpeed =
-        a.vx - b.vx;
+    // 2. Left-to-Right Scrolling (vx < 0)
+    if (a.vx < 0) {
+        const gap = b.x - (a.x + a.width + CONFIG.scroll.gap);
+        if (gap <= 0) return true;
+        
+        // A lower/more-negative vx means faster rightward movement
+        if (a.vx >= b.vx) return false; 
 
-    const catchTime =
-        gap / relativeSpeed;
+        const relativeSpeed = b.vx - a.vx; // Positive speed delta
+        return (gap / relativeSpeed) < CONFIG.scroll.lookahead;
+    }
 
-    return (
-        catchTime <
-        CONFIG.scroll.lookahead
-    );
+    return false;
 }
 
-function canUseCenterLane(
-    width,
-    height,
-    vx,
-    laneIndex
-) {
-    const lane =
-        centerLanes[laneIndex];
+function canUseCenterLane(width, height, vx, laneIndex) {
+    const lane = centerLanes[laneIndex];
+    if (!lane) return false;
 
-    if (!lane) {
-        return false;
-    }
-
+    // Set correct starting X based on direction
+    const isReverse = vx < 0;
     const candidate = {
-        x: W,
-        y:
-            CONFIG.laneHeight / 2 +
-            laneIndex *
-            CONFIG.laneHeight,
-
+        x: isReverse ? -width : W,
+        y: CONFIG.laneHeight / 2 + laneIndex * CONFIG.laneHeight,
         width,
         height,
         vx
     };
 
     for (const c of lane.comments) {
-        if (
-            willScrollCollide(
-                candidate,
-                c
-            )
-        ) {
+        if (willScrollCollide(candidate, c)) {
             return false;
         }
     }
@@ -301,16 +284,18 @@ function findCenterLane(
 }
 
 
-
+// text   : string
+// mode   : "top" || "bottom"
+// color  : rgb888 int
 function createFixedComment(
     text,
-    mode
+    mode,
+    c888
 ) {
     const metrics =
         getMetrics(text, true);
 
-    const color =
-        randomColor();
+    const color = `#${c888.toString(16).padStart(6, "0")}`;
 
     const sprite =
         getSprite(
@@ -368,7 +353,7 @@ function createFixedComment(
             lane.index * CONFIG.laneHeight;
     }
 
-comments.push({
+    comments.push({
         text,
         mode,
         x: W / 2,
@@ -396,15 +381,17 @@ comments.push({
 }
 
 
-
-function createScrollComment(text) {
+// text   : string
+// reverse: int
+// color  : rgb888 int
+function createScrollComment(text, c888, reverse) {
     const metrics =
         getMetrics(
             text,
             false
         );
 
-    const color = "#ffffff";
+    const color = `#${c888.toString(16).padStart(6, "0")}`;
 
     const sprite =
         getSprite(
@@ -414,11 +401,15 @@ function createScrollComment(text) {
         );
 
     
-    const vx =
+    const speed =
         speedFor(
             sprite.width
         );
 
+    const vx =
+        reverse == 1
+            ? -speed
+            : speed;
     
     const laneIndex =
         findCenterLane(
@@ -441,7 +432,10 @@ function createScrollComment(text) {
         text,
         mode: "scroll",
 
-        x: W,
+        x:
+            reverse == 1
+                ? -sprite.width
+                : W,
 
         y:
             CONFIG.laneHeight / 2 +
@@ -492,7 +486,9 @@ function createScrollComment(text) {
 
 function createComment(
     text,
-    mode = "scroll"
+    mode = "scroll",
+    color = 16777215,
+    reverse = 0,
 ) {
     if (
         mode === "top" ||
@@ -500,12 +496,15 @@ function createComment(
     ) {
         return createFixedComment(
             text,
-            mode
+            mode,
+            color
         );
     }
 
     return createScrollComment(
-        text
+        text,
+        color,
+        reverse
     );
 }
 
