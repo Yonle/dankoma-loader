@@ -1,5 +1,45 @@
 const renderCache = new Map();
 
+function makeCanvas(width, height) {
+    if (typeof OffscreenCanvas !== "undefined") {
+        return new OffscreenCanvas(width, height);
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+}
+
+
+function drawText(
+    ctx,
+    text,
+    color,
+    paddingX,
+    paddingY,
+    metrics
+) {
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 2.0;
+    ctx.strokeStyle = "#000";
+
+    ctx.strokeText(
+        text,
+        paddingX,
+        paddingY + metrics.ascent
+    );
+
+    ctx.fillStyle = color;
+
+    ctx.fillText(
+        text,
+        paddingX,
+        paddingY + metrics.ascent
+    );
+}
+
+const SPRITE_DPR = CONFIG.dpr;
 
 function createSprite(text, fixed, color) {
     const metrics = getMetrics(text, fixed);
@@ -10,34 +50,44 @@ function createSprite(text, fixed, color) {
     const glyphWidth = metrics.width;
     const glyphHeight = metrics.height;
 
-    const width =
+    const logicalWidth =
         Math.ceil(glyphWidth + paddingX * 2);
 
-    const height =
+    const logicalHeight =
         Math.ceil(glyphHeight + paddingY * 2);
 
+    const width =
+        Math.ceil(logicalWidth * SPRITE_DPR);
+
+    const height =
+        Math.ceil(logicalHeight * SPRITE_DPR);
+
     const canvas =
-        new OffscreenCanvas(width, height);
+        makeCanvas(width, height);
 
     const ctx =
         canvas.getContext("2d");
 
+    ctx.scale(SPRITE_DPR, SPRITE_DPR);
+
     ctx.font = metrics.font;
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = color;
 
-    ctx.fillText(
+    drawText(
+        ctx,
         text,
+        color,
         paddingX,
-        paddingY + metrics.ascent
+        paddingY,
+        metrics
     );
 
     return {
         canvas,
 
-        width,
-        height,
+        width: logicalWidth,
+        height: logicalHeight,
 
         glyphWidth,
         glyphHeight,

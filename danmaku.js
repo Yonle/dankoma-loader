@@ -8,31 +8,6 @@ let W = 0;
 let H = 0;
 let dpr = 1;
 
-const CONFIG = {
-    laneHeight: 32,
-
-    fonts: {
-        scroll: 28,
-        fixed: 32,
-        weight: 700,
-        family: `"Noto Sans CJK SC", "Microsoft YaHei", sans-serif`
-    },
-
-    style: {
-        opacity: 0.8
-    },
-
-    scroll: {
-        duration: 5,
-        lookahead: 8,
-        gap: 2
-    },
-
-    fixed: {
-        lifetime: 4000
-    }
-};
-
 const topLanes = [];
 const bottomLanes = [];
 const centerLanes = [];
@@ -40,8 +15,6 @@ const centerLanes = [];
 const comments = [];
 
 const metricsCache = new Map();
-
-
 
 function fontFor(fixed) {
     const size = fixed
@@ -283,6 +256,16 @@ function findCenterLane(
     return fallback;
 }
 
+function rgbaFromRGB888(color, alpha = 1) {
+    const n = number(color, 0xffffff) >>> 0;
+
+    const r = (n >>> 16) & 0xff;
+    const g = (n >>> 8) & 0xff;
+    const b = n & 0xff;
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 
 // text   : string
 // mode   : "top" || "bottom"
@@ -295,7 +278,7 @@ function createFixedComment(
     const metrics =
         getMetrics(text, true);
 
-    const color = `#${c888.toString(16).padStart(6, "0")}`;
+    const color = rgbaFromRGB888(c888);
 
     const sprite =
         getSprite(
@@ -360,7 +343,7 @@ function createFixedComment(
         y,
         width: metrics.width,
         height: metrics.height,
-        sprite: sprite.canvas,
+        sprite: sprite,
         spriteWidth: sprite.width,
         spriteHeight: sprite.height,
         glyphX: sprite.glyphX,
@@ -391,8 +374,8 @@ function createScrollComment(text, c888, reverse) {
             false
         );
 
-    const color = `#${c888.toString(16).padStart(6, "0")}`;
-
+    const color = rgbaFromRGB888(c888);
+    
     const sprite =
         getSprite(
             text,
@@ -403,7 +386,7 @@ function createScrollComment(text, c888, reverse) {
     
     const speed =
         speedFor(
-            sprite.width
+            metrics.width
         );
 
     const vx =
@@ -434,7 +417,7 @@ function createScrollComment(text, c888, reverse) {
 
         x:
             reverse == 1
-                ? -sprite.width
+                ? -metrics.width
                 : W,
 
         y:
@@ -445,7 +428,7 @@ function createScrollComment(text, c888, reverse) {
         width: metrics.width,
         height: metrics.height,
 
-        sprite: sprite.canvas,
+        sprite: sprite,
 
         spriteWidth: sprite.width,
         spriteHeight: sprite.height,
@@ -549,64 +532,30 @@ function removeComment(index) {
 function drawComment(c) {
     ctx.globalAlpha = c.alpha;
 
-    let glyphCenterX;
-
-    if (c.mode === "scroll") {
-        glyphCenterX =
-            c.x +
-            c.width / 2;
-    } else {
-        glyphCenterX =
-            c.x;
-    }
+    const glyphCenterX =
+        c.mode === "scroll"
+            ? c.x + c.width / 2
+            : c.x;
 
     const spriteX =
-        glyphCenterX -
-        c.anchorX;
+        glyphCenterX - c.anchorX;
 
     const spriteY =
-        c.y -
-        c.anchorY;
+        c.y - c.anchorY;
 
     ctx.drawImage(
-        c.sprite,
-        Math.round(spriteX),
-        Math.round(spriteY)
+        c.sprite.canvas,
+        spriteX,
+        spriteY,
+        c.sprite.width,
+        c.sprite.height
     );
 }
-
-
-
-canvas.addEventListener(
-    "click",
-    () => {
-        const r =
-            Math.random();
-
-        createComment(
-            "点击成功 " +
-            samples[
-                Math.floor(
-                    Math.random() *
-                    samples.length
-                )
-            ],
-
-            r < 0.5
-                ? "scroll"
-                : r < 0.75
-                    ? "top"
-                    : "bottom"
-        );
-    }
-);
-
-
 
 let last =
     performance.now();
 
-function frame(now) {
+function drawDanmaFrame(now) {
     if (!now) {
         now = performance.now();
     }
@@ -658,12 +607,4 @@ function frame(now) {
     }
 
     ctx.globalAlpha = 1;
-
-    requestAnimationFrame(
-        frame
-    );
 }
-
-requestAnimationFrame(
-    frame
-);

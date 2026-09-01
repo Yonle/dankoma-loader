@@ -1,0 +1,25 @@
+{
+    "height": "Font size",
+
+    "laneHeight": "Danmaku lane height",
+    "dpr": "Canvas device pixel ratio",
+
+    "fonts.scroll": "Scrolling danmaku font size",
+    "fonts.fixed": "Top/bottom danmaku font size",
+    "fonts.weight": "Font weight",
+    "fonts.family": "Font family",
+
+    "style.opacity": "Default danmaku opacity",
+
+    "scroll.duration": "Scrolling danmaku duration",
+    "scroll.lookahead": "Scrolling danmaku lookahead",
+    "scroll.gap": "Minimum gap between scrolling danmaku",
+
+    "fixed.lifetime": "Top/bottom danmaku lifetime",
+
+    "mode7.weight": "Mode 7 font weight",
+    "mode7.outlineWidth": "Mode 7 outline width",
+    "mode7.scaleToCanvas": "Scale Mode 7 coordinates to canvas",
+    "mode7.betaYAxis": "Enable Mode 7 Y-axis transform",
+    "mode7.focalLength": "Mode 7 perspective focal length"
+}

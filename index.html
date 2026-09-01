@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Canvas Danmaku PoC</title>
+<link
+    rel="preload"
+    href="/fonts/SimHei.ttf"
+    as="font"
+    type="font/ttf"
+    crossorigin
+>
+<style>
+  @font-face {
+    font-family: "SimHei";
+    src: url("/fonts/SimHei.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111;
+    color: white;
+    font-family: system-ui, sans-serif;
+  }
+
+  canvas, video {
+    position: fixed;
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
+  }
+
+  canvas {
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  #controls {
+    position: fixed;
+    z-index: 10;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 12px;
+
+    box-sizing: border-box;
+
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.8),
+        rgba(0, 0, 0, 0)
+    );
+  }
+
+  #controls button {
+      flex: 0 0 auto;
+
+      width: 36px;
+      height: 36px;
+
+      padding: 0;
+
+      border: 0;
+      border-radius: 4px;
+
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+
+      font-size: 18px;
+
+      cursor: pointer;
+  }
+
+  #controls button:hover {
+      background: rgba(255, 255, 255, 0.2);
+  }
+
+  #seekbar {
+      flex: 1 1 auto;
+      min-width: 0;
+  }
+
+  #volume {
+      flex: 0 0 100px;
+  }
+
+  .settings-popup {
+    position: fixed;
+    z-index: 20;
+
+    right: 12px;
+    bottom: 60px;
+
+    width: 320px;
+    max-height: 70vh;
+
+    overflow-y: auto;
+
+    background: rgba(20, 20, 20, 0.96);
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .settings-header {
+      position: sticky;
+      top: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 10px 12px;
+
+      background: rgba(20, 20, 20, 0.98);
+
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      font-weight: 600;
+  }
+
+  .settings-header button {
+      width: 28px;
+      height: 28px;
+
+      border: 0;
+      background: transparent;
+      color: white;
+
+      font-size: 20px;
+      cursor: pointer;
+  }
+
+  .settings-list {
+      padding: 8px;
+  }
+
+  .setting {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      padding: 8px 4px;
+  }
+
+  .setting-info {
+      flex: 1;
+      min-width: 0;
+  }
+
+  .setting-name {
+      font-size: 13px;
+      font-weight: 600;
+
+      word-break: break-word;
+  }
+
+  .setting-desc {
+      margin-top: 2px;
+
+      font-size: 11px;
+      opacity: 0.55;
+  }
+
+  .setting input[type="number"],
+  .setting input[type="text"] {
+      width: 90px;
+
+      box-sizing: border-box;
+
+      padding: 5px 6px;
+
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+  }
+
+  .setting input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+  }
+
+  .setting select {
+      max-width: 130px;
+
+      padding: 5px;
+
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+
+      background: #222;
+      color: white;
+  }
+
+</style>
+</head>
+<body>
+
+<video></video>
+
+<div id="controls">
+    <button id="playPause" type="button">▶</button>
+    <button id="canvasToggle" type="button">DM</button>
+
+    <input
+        id="seekbar"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        step="0.01"
+    >
+
+    <input
+        id="volume"
+        type="range"
+        min="0"
+        max="1"
+        value="1"
+        step="0.01"
+    >
+
+    <button id="settings" type="button">⚙</button>
+    <div id="settingsPopup" class="settings-popup" hidden>
+    <div class="settings-header">
+        <span>Settings</span>
+        <button id="settingsClose" type="button">×</button>
+    </div>
+
+    <div id="settingsList" class="settings-list"></div>
+  </div>
+</div>
+
+<canvas id="danmaku"></canvas>
+
+<script src="config.js"></script>
+<script src="rasterizer.js"></script>
+<script src="danmaku.js"></script>
+<script src="rasterizer_mode7.js"></script>
+<script src="mode7.js"></script>
+<script src="player.js"></script>
+<script src="videocontrol.js"></script>
+<script src="settings_ui.js"></script>
+</body>
+</html>
