@@ -11,13 +11,12 @@ function showControls() {
 
     clearTimeout(controlsTimer);
 
-    controlsTimer = setTimeout(() => {
-        controls.classList.add("hidden");
-    }, 2500);
+    controlsTimer = setTimeout(hideControls, 2500);
 }
 
 function hideControls() {
-    if (!video.paused) {
+    if (!video.paused && !settingsPopup.hidden
+) {
         controls.classList.add("hidden");
     }
 }
