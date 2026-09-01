@@ -75,6 +75,10 @@ function setConfigValue(path, value) {
 
         renderSettings();
     }
+
+    if (path === "dpr") {
+        SPRITE_DPR = value;
+    }
 }
 
 function createSettingControl(path, value) {

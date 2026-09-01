@@ -1,5 +1,7 @@
 const renderCache = new Map();
 
+let SPRITE_DPR = CONFIG.dpr;
+
 function makeCanvas(width, height) {
     if (typeof OffscreenCanvas !== "undefined") {
         return new OffscreenCanvas(width, height);
@@ -38,8 +40,6 @@ function drawText(
         paddingY + metrics.ascent
     );
 }
-
-const SPRITE_DPR = CONFIG.dpr;
 
 function createSprite(text, fixed, color) {
     const metrics = getMetrics(text, fixed);

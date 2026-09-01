@@ -30,12 +30,6 @@ let CONFIG = {
         // Text outline.
         outlineWidth: 1,
 
-        // Whether to fit Mode 7's 1920x1080 coordinate space
-        // to the current canvas size.
-        scaleToCanvas: true,
-
-        betaYAxis: true,
-
         focalLength: 800,
     }
 };

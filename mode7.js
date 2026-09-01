@@ -379,105 +379,6 @@ function mode7_frame(danmaku, time) {
  * Drawing
  * ------------------------------------------------------ */
 
-function drawMode7_lite(ctx, danmaku, time) {
-    const frame = mode7_frame(
-        danmaku,
-        time
-    );
-
-    if (!frame) {
-        return false;
-    }
-
-    const sprite = getMode7Sprite(danmaku);
-
-    const logicalWidth =
-        canvas.width / CONFIG.dpr;
-
-    const logicalHeight =
-        canvas.height / CONFIG.dpr;
-
-    let sx = 1;
-    let sy = 1;
-
-    if (CONFIG.mode7.scaleToCanvas) {
-        sx =
-            logicalWidth /
-            CONFIG.mode7.width;
-
-        sy =
-            logicalHeight /
-            CONFIG.mode7.height;
-    }
-
-    ctx.save();
-
-    /*
-     * Mode 7 coordinates → logical canvas coordinates.
-     */
-    ctx.translate(
-        frame.x * sx,
-        frame.y * sy
-    );
-
-    /*
-     * Temporary Y-axis approximation.
-     *
-     * Keep it isolated so we can replace it later.
-     */
-    if (
-        CONFIG.mode7.simulateYRotation &&
-        frame.yRotation !== 0
-    ) {
-        ctx.scale(
-            Math.cos(
-                degree(frame.yRotation)
-            ),
-            1
-        );
-    }
-
-    /*
-     * Z-axis rotation.
-     */
-    if (frame.zRotation !== 0) {
-        ctx.rotate(
-            degree(frame.zRotation)
-        );
-    }
-
-    ctx.globalAlpha = Math.max(
-        0,
-        Math.min(
-            1,
-            frame.opacity
-        )
-    );
-
-    /*
-     * Top-left anchor.
-     *
-     * x/y points to the top-left of the raster.
-     */
-    ctx.drawImage(
-        sprite.canvas,
-
-        0,
-        0,
-        sprite.canvas.width,
-        sprite.canvas.height,
-
-        0,
-        0,
-        sprite.width,
-        sprite.height
-    );
-
-    ctx.restore();
-
-    return true;
-}
-
 function drawMode7YAxis3D(ctx, sprite, yRotation) {
     const angle = degree(yRotation);
 
@@ -611,10 +512,6 @@ function drawMode7(ctx, danmaku, time) {
     let sx = 1;
     let sy = 1;
 
-    if (CONFIG.mode7.scaleToCanvas) {
-        sx = logicalWidth / CONFIG.mode7.width;
-        sy = logicalHeight / CONFIG.mode7.height;
-    }
 
     ctx.save();
 
