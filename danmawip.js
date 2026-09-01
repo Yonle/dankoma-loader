@@ -23,7 +23,7 @@ const CONFIG = {
     },
 
     scroll: {
-        duration: 6,
+        duration: 5,
         lookahead: 8,
         gap: 2
     },
