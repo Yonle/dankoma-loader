@@ -114,13 +114,25 @@ function rebuildLanes() {
             comments: []
         });
     }
+
+    for (const c of comments) {
+        if (c.mode === "scroll" && centerLanes[c.laneIndex]) {
+            centerLanes[c.laneIndex].comments.push(c);
+        }
+        // Top and bottom lanes check occupiedUntil, so we can restore that too
+        else if (c.mode === "top" && topLanes[c.laneIndex]) {
+             topLanes[c.laneIndex].occupiedUntil = 
+                 Math.max(topLanes[c.laneIndex].occupiedUntil, c.born + c.lifetime);
+        }
+        else if (c.mode === "bottom" && bottomLanes[c.laneIndex]) {
+             bottomLanes[c.laneIndex].occupiedUntil = 
+                 Math.max(bottomLanes[c.laneIndex].occupiedUntil, c.born + c.lifetime);
+        }
+    }
 }
 
 function resize() {
-    dpr = Math.min(
-        window.devicePixelRatio || 1,
-        window.innerWidth < 768 ? 1 : 2
-    );
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     W = window.innerWidth;
     H = window.innerHeight;
@@ -560,8 +572,8 @@ function drawComment(c) {
 
     ctx.drawImage(
         c.sprite,
-        spriteX,
-        spriteY
+        Math.round(spriteX),
+        Math.round(spriteY)
     );
 }
 
