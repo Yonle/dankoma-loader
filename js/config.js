@@ -27,6 +27,8 @@ let CONFIG = {
         // Used when the embedded font doesn't specify anything.
         weight: 400,
 
+        
+
         // Text outline.
         outlineWidth: 1,
 
