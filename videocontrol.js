@@ -6,19 +6,18 @@ const fullscreen = document.getElementById("fullscreen");
 const canvasToggle = document.getElementById("canvasToggle");
 let controlsTimer = null;
 
+function hideControls() {
+    if (settingsPopup.hidden) {
+        controls.classList.add("hidden");
+    }
+}
+
 function showControls() {
     controls.classList.remove("hidden");
 
     clearTimeout(controlsTimer);
 
     controlsTimer = setTimeout(hideControls, 2500);
-}
-
-function hideControls() {
-    if (!video.paused && !settingsPopup.hidden
-) {
-        controls.classList.add("hidden");
-    }
 }
 
 video.addEventListener("mousemove", showControls);
