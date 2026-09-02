@@ -19,6 +19,8 @@
  * ]
  */
 
+const mode7RenderedCache = new WeakMap();
+
 /* ---------------------------------------------------------
  * Helpers
  * ------------------------------------------------------ */
@@ -272,6 +274,248 @@ function createMode7(record) {
     return danmaku;
 }
 
+/* ---------------------------------------------------------
+ * Mode 7 rendered-sprite cache
+ * ------------------------------------------------------ */
+
+function getMode7RenderedSprite(danmaku) {
+    const sprite = getMode7Sprite(danmaku);
+
+    if (danmaku.yRotation === 0) {
+        return sprite;
+    }
+
+    const focal = CONFIG.mode7.focalLength ?? 1000;
+
+    const slices = Math.min(
+        24,
+        Math.max(
+            8,
+            Math.ceil(sprite.width / 8)
+        )
+    );
+
+    const rotationKey =
+        Math.round(danmaku.yRotation * 10) / 10;
+
+    let cache = mode7RenderedCache.get(sprite);
+
+    if (!cache) {
+        cache = new Map();
+        mode7RenderedCache.set(sprite, cache);
+    }
+
+    const key = `${rotationKey}:${focal}:${slices}`;
+
+    let rendered = cache.get(key);
+
+    if (rendered) {
+        return rendered;
+    }
+
+    const angle = degree(rotationKey);
+
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+
+    const width = sprite.width;
+    const height = sprite.height;
+
+    const halfW = width / 2;
+
+    const spriteDpr =
+        sprite.canvas.width / sprite.width;
+
+    const srcCanvasWidth =
+        sprite.canvas.width;
+
+    const srcH =
+        sprite.canvas.height;
+
+    const leftX = -halfW;
+    const rightX = halfW;
+
+    const leftDepth =
+        focal - leftX * sinA;
+
+    const rightDepth =
+        focal - rightX * sinA;
+
+    if (leftDepth <= 1 || rightDepth <= 1) {
+        return sprite;
+    }
+
+    const leftScale =
+        focal / leftDepth;
+
+    const rightScale =
+        focal / rightDepth;
+
+    const leftProjectedX =
+        leftX * cosA * leftScale;
+
+    const rightProjectedX =
+        rightX * cosA * rightScale;
+
+    const minX =
+        Math.min(
+            leftProjectedX,
+            rightProjectedX
+        );
+
+    const maxX =
+        Math.max(
+            leftProjectedX,
+            rightProjectedX
+        );
+
+    const projectedHeight =
+        height *
+        Math.max(
+            leftScale,
+            rightScale
+        );
+
+    const pad = 2;
+
+    const outputWidth =
+        Math.ceil(maxX - minX) +
+        pad * 2;
+
+    const outputHeight =
+        Math.ceil(projectedHeight) +
+        pad * 2;
+
+    const outputCanvas =
+        document.createElement("canvas");
+
+    outputCanvas.width =
+        Math.ceil(outputWidth * spriteDpr);
+
+    outputCanvas.height =
+        Math.ceil(outputHeight * spriteDpr);
+
+    const out =
+        outputCanvas.getContext("2d", {
+            alpha: true,
+        });
+
+    out.setTransform(
+        spriteDpr,
+        0,
+        0,
+        spriteDpr,
+        0,
+        0
+    );
+
+    out.translate(
+        -minX + pad,
+        projectedHeight / 2 + pad
+    );
+
+    for (let i = 0; i < slices; i++) {
+        const x0 =
+            -halfW +
+            width * i / slices;
+
+        const x1 =
+            -halfW +
+            width * (i + 1) / slices;
+
+        const rotX0 =
+            x0 * cosA;
+
+        const rotZ0 =
+            -x0 * sinA;
+
+        const depth0 =
+            focal + rotZ0;
+
+        if (depth0 <= 1) {
+            continue;
+        }
+
+        const scale0 =
+            focal / depth0;
+
+        const destX0 =
+            rotX0 * scale0;
+
+        const rotX1 =
+            x1 * cosA;
+
+        const rotZ1 =
+            -x1 * sinA;
+
+        const depth1 =
+            focal + rotZ1;
+
+        if (depth1 <= 1) {
+            continue;
+        }
+
+        const scale1 =
+            focal / depth1;
+
+        const destX1 =
+            rotX1 * scale1;
+
+        const destWidth =
+            destX1 - destX0;
+
+        if (destWidth <= 0) {
+            continue;
+        }
+
+        const destHeight =
+            height * scale0;
+
+        const destY =
+            -destHeight / 2;
+
+        const srcX0 =
+            Math.floor(
+                srcCanvasWidth * i / slices
+            );
+
+        const srcX1 =
+            Math.floor(
+                srcCanvasWidth * (i + 1) / slices
+            );
+
+        const srcW =
+            srcX1 - srcX0;
+
+        if (srcW <= 0) {
+            continue;
+        }
+
+        out.drawImage(
+            sprite.canvas,
+            srcX0,
+            0,
+            srcW,
+            srcH,
+            destX0,
+            destY,
+            destWidth,
+            destHeight
+        );
+    }
+
+    rendered = {
+        canvas: outputCanvas,
+        width: outputWidth,
+        height: outputHeight,
+        offsetX: minX - pad,
+        offsetY: -projectedHeight / 2 - pad,
+    };
+
+    cache.set(key, rendered);
+
+    return rendered;
+}
 
 /* ---------------------------------------------------------
  * Frame evaluation
@@ -379,182 +623,48 @@ function mode7_frame(danmaku, time) {
  * Drawing
  * ------------------------------------------------------ */
 
-function drawMode7YAxis3D(ctx, sprite, yRotation) {
-    const angle = degree(yRotation);
-
-    const width = sprite.width;
-    const height = sprite.height;
-
-    const halfW = width / 2;
-    const halfH = height / 2;
-
-    /*
-     * Camera focal length.
-     * Larger = weaker perspective.
-     */
-    const focal = CONFIG.mode7.focalLength ?? 1000;
-
-    /*
-     * Rotate a 3D point around Y.
-     */
-    function rotateY(px, py, pz) {
-        const c = Math.cos(angle);
-        const s = Math.sin(angle);
-
-        return {
-            x: px * c + pz * s,
-            y: py,
-            z: -px * s + pz * c,
-        };
-    }
-
-    /*
-     * Project 3D -> 2D.
-     */
-    function project(v) {
-        const depth = focal + v.z;
-
-        if (depth <= 1) {
-            return null;
-        }
-
-        const scale = focal / depth;
-
-        return {
-            x: v.x * scale,
-            y: v.y * scale,
-            scale,
-        };
-    }
-
-    /*
-     * Y-axis rotation requires VERTICAL slices (columns) 
-     * to accurately simulate perspective scaling along the X axis.
-     */
-    const slices = 32;
-    const sourceSliceWidth = width / slices;
-
-    // Calculate DPR specific to the sprite cache
-    const spriteDprX = sprite.canvas.width / sprite.width;
-
-    ctx.save();
-
-    // Mode 7 typically anchors top-left, but 3D transforms should pivot around the center.
-    ctx.translate(halfW, halfH);
-
-    for (let i = 0; i < slices; i++) {
-        const u0 = i / slices;
-        const u1 = (i + 1) / slices;
-
-        /*
-         * Source-space X coordinates (relative to center).
-         */
-        const x0 = -halfW + width * u0;
-        const x1 = -halfW + width * u1;
-
-        /*
-         * Project the left and right boundaries of this column.
-         */
-        const p0 = project(rotateY(x0, 0, 0));
-        const p1 = project(rotateY(x1, 0, 0));
-
-        if (!p0 || !p1) {
-            continue;
-        }
-
-        /*
-         * Width and placement of the strip after perspective.
-         */
-        const destX = p0.x;
-        const destWidth = p1.x - p0.x;
-
-        const destHeight = height * p0.scale;
-        const destY = -destHeight / 2;
-
-        /*
-         * Draw the vertical source column projected onto the canvas.
-         */
-        ctx.drawImage(
-            sprite.canvas,
-
-            // Source coordinates (accounting for sprite Cache DPR)
-            Math.floor(i * sourceSliceWidth * spriteDprX),
-            0,
-            Math.ceil(sourceSliceWidth * spriteDprX),
-            sprite.canvas.height,
-
-            // Destination coordinates
-            destX,
-            destY,
-            destWidth,
-            destHeight
-        );
-    }
-
-    ctx.restore();
-}
-
 function drawMode7(ctx, danmaku, time) {
-    const frame = mode7_frame(
-        danmaku,
-        time
-    );
+    const frame = mode7_frame(danmaku, time);
 
     if (!frame) {
         return false;
     }
 
-    const sprite = getMode7Sprite(danmaku);
-
-    const logicalWidth = canvas.width / CONFIG.dpr;
-    const logicalHeight = canvas.height / CONFIG.dpr;
-
-    let sx = 1;
-    let sy = 1;
-
+    const sprite =
+        getMode7RenderedSprite(danmaku);
 
     ctx.save();
 
-    // Base coordinate translation (anchors to top-left of the sprite's starting location)
     ctx.translate(
-        frame.x * sx,
-        frame.y * sy
+        frame.x,
+        frame.y
     );
 
-    /*
-     * Z-axis rotation.
-     */
     if (frame.zRotation !== 0) {
         ctx.rotate(
             degree(frame.zRotation)
         );
     }
 
-    ctx.globalAlpha = Math.max(
-        0,
-        Math.min(
-            1,
-            frame.opacity
-        )
-    );
-
-    if (frame.yRotation !== 0) {
-        // We pass only ctx, sprite, and rotation. 
-        // Translation is already managed by the parent block to prevent double-offsets.
-        drawMode7YAxis3D(
-            ctx,
-            sprite,
-            frame.yRotation
+    ctx.globalAlpha =
+        Math.max(
+            0,
+            Math.min(1, frame.opacity)
         );
-    } else {
+
+    if (danmaku.yRotation === 0) {
         ctx.drawImage(
             sprite.canvas,
             0,
             0,
-            sprite.canvas.width,
-            sprite.canvas.height,
-            0,
-            0,
+            sprite.width,
+            sprite.height
+        );
+    } else {
+        ctx.drawImage(
+            sprite.canvas,
+            sprite.offsetX,
+            sprite.offsetY,
             sprite.width,
             sprite.height
         );

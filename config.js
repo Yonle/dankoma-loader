@@ -1,6 +1,6 @@
 let CONFIG = {
     laneHeight: 32,
-    dpr: 2,
+    dpr: 1.5,
 
     fonts: {
         scroll: 28,

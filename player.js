@@ -154,7 +154,7 @@ function mode7frameDanma(currentTime) {
 // Keep these as separate animation loops.
 // Mode 7 and normal danmaku rendering should not be
 // structurally coupled together.
-function trackDanma() {
+function trackDanma(now) {
     if (!video.paused && drawEnabled) {
         const currentTime = video.currentTime;
         updateDanmaku(currentTime);
@@ -163,18 +163,11 @@ function trackDanma() {
     requestAnimationFrame(trackDanma);
 }
 
-function danmaM7Frame() {
+function danmaFrame(now) {
     if (!video.paused && drawEnabled) {
         const currentTime = video.currentTime;
-        mode7frameDanma(currentTime);
-    }
-
-    requestAnimationFrame(danmaM7Frame);
-}
-
-function danmaFrame(now) {
-    if (!video.paused) {
         drawDanmaFrame(now);
+        mode7frameDanma(currentTime);
     }
 
     requestAnimationFrame(danmaFrame);
@@ -231,4 +224,3 @@ async function initDanmaku(source) {
 }
 
 requestAnimationFrame(danmaFrame);
-requestAnimationFrame(danmaM7Frame);
