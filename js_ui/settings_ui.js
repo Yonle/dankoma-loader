@@ -48,7 +48,7 @@ function flattenConfig(value, prefix = "") {
 
 function getConfigValue(path) {
     const parts = path.split(".");
-    let value = CONFIG;
+    let value = danma.config;
 
     for (const part of parts) {
         value = value?.[part];
@@ -61,23 +61,40 @@ function setConfigValue(path, value) {
     const parts = path.split(".");
     const last = parts.pop();
 
-    let target = CONFIG;
+    // Build a minimal nested config object.
+    let update = {};
+    let target = update;
 
     for (const part of parts) {
+        target[part] = {};
         target = target[part];
     }
 
     target[last] = value;
 
-    if (path === "laneHeight") {
-        CONFIG.fonts.scroll = value;
-        CONFIG.fonts.fixed = value;
+    danma.updateConfig(update);
 
-        renderSettings();
-    }
+    /*
+     * Some settings require additional renderer state changes.
+     */
 
     if (path === "dpr") {
-        SPRITE_DPR = value;
+        /*
+         * updateConfig() already updates SPRITE_DPR,
+         * but existing cached sprites were created
+         * using the previous DPR.
+         *
+         * Clear the relevant caches so new sprites use
+         * the new DPR.
+         */
+        danma.mode7RenderedCache = new WeakMap();
+        danma.mode7SpriteCache.clear();
+        danma.renderCache.clear();
+    }
+
+    if (path === "laneHeight") {
+        danma.rebuildLanes();
+        renderSettings();
     }
 }
 
@@ -124,7 +141,10 @@ function createSettingControl(path, value) {
             const next = Number(input.value);
 
             if (Number.isFinite(next)) {
-                setConfigValue(path, next);
+                setConfigValue(
+                    path,
+                    next
+                );
             }
         });
 
@@ -153,7 +173,7 @@ function renderSettings() {
 
     list.replaceChildren();
 
-    for (const setting of flattenConfig(CONFIG)) {
+    for (const setting of flattenConfig(danma.config)) {
         list.appendChild(
             createSettingControl(
                 setting.path,
@@ -182,4 +202,9 @@ settingsClose.addEventListener("click", () => {
     settingsPopup.hidden = true;
 });
 
-loadSettingsDescriptions()
+loadSettingsDescriptions().catch((err) => {
+    console.error(
+        "Failed to load settings descriptions:",
+        err
+    );
+});

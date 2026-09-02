@@ -18,6 +18,5 @@
     "fixed.lifetime": "Top/bottom danmaku lifetime",
 
     "mode7.weight": "Mode 7 font weight",
-    "mode7.outlineWidth": "Mode 7 outline width",
-    "mode7.focalLength": "Mode 7 perspective focal length"
+    "mode7.outlineWidth": "Mode 7 outline width"
 }

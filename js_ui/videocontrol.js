@@ -4,6 +4,7 @@ const volume = document.getElementById("volume");
 const settings = document.getElementById("settings");
 const fullscreen = document.getElementById("fullscreen");
 const canvasToggle = document.getElementById("canvasToggle");
+
 let controlsTimer = null;
 
 function hideControls() {
@@ -25,22 +26,23 @@ video.addEventListener("click", showControls);
 
 controls.addEventListener("mousemove", showControls);
 
-video.addEventListener("play", () => {
-    showControls();
-});
-
-video.addEventListener("pause", () => {
-    showControls();
-});
+video.addEventListener("play", showControls);
+video.addEventListener("pause", showControls);
 
 showControls();
 
 canvasToggle.addEventListener("click", () => {
-    drawEnabled = !drawEnabled;
+    danma.drawEnabled = !danma.drawEnabled;
 
-    canvas.style.display = drawEnabled
+    canvas.style.display = danma.drawEnabled
         ? "block"
         : "none";
+
+    if (danma.drawEnabled) {
+        danma.unhide();
+    } else {
+        danma.hide();
+    }
 });
 
 playPause.addEventListener("click", () => {
@@ -94,16 +96,10 @@ fullscreen.addEventListener("click", async () => {
             await document.exitFullscreen();
         }
     } catch (err) {
-        console.error(
-            "fullscreen failed:",
-            err
-        );
+        console.error("fullscreen failed:", err);
     }
 });
 
 document.addEventListener("fullscreenchange", () => {
-    fullscreen.textContent =
-        document.fullscreenElement
-            ? "⛶"
-            : "⛶";
+    fullscreen.textContent = "⛶";
 });
