@@ -34,10 +34,6 @@ showControls();
 canvasToggle.addEventListener("click", () => {
     dankoma.drawEnabled = !dankoma.drawEnabled;
 
-    canvas.style.display = dankoma.drawEnabled
-        ? "block"
-        : "none";
-
     if (dankoma.drawEnabled) {
         dankoma.unhide();
     } else {
