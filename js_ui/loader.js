@@ -164,11 +164,15 @@ const loadButton = overlay.querySelector("#loadButton");
 const status = overlay.querySelector("#loaderStatus");
 
 async function load(videoSource, danmakuSource) {
-    video.src = URL.createObjectURL(videoSource);
+    if (typeof videoSource === "string") {
+        video.src = videoSource;
+    } else {
+        video.src = URL.createObjectURL(videoSource);
+    }
+
     video.load();
 
     dankoma.trackVideo(video);
-
     await dankoma.loadDanmaJSONL(danmakuSource);
 
     overlay.remove();
@@ -179,19 +183,7 @@ async function loadSample(sample) {
     status.textContent = `Loading ${sample.name}...`;
 
     try {
-        const [videoResponse, danmakuResponse] = await Promise.all([
-            fetch(sample.video),
-            fetch(sample.danmaku)
-        ]);
-
-        if (!videoResponse.ok || !danmakuResponse.ok) {
-            throw new Error("Failed to fetch sample.");
-        }
-
-        await load(
-            await videoResponse.blob(),
-            await danmakuResponse.blob()
-        );
+        await load(sample.video, sample.danmaku);
     } catch (error) {
         console.error(error);
         status.textContent = `Failed to load sample: ${error.message}`;
