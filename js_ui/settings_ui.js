@@ -48,7 +48,7 @@ function flattenConfig(value, prefix = "") {
 
 function getConfigValue(path) {
     const parts = path.split(".");
-    let value = danma.config;
+    let value = dankoma.config;
 
     for (const part of parts) {
         value = value?.[part];
@@ -72,7 +72,7 @@ function setConfigValue(path, value) {
 
     target[last] = value;
 
-    danma.updateConfig(update);
+    dankoma.updateConfig(update);
 
     /*
      * Some settings require additional renderer state changes.
@@ -87,13 +87,13 @@ function setConfigValue(path, value) {
          * Clear the relevant caches so new sprites use
          * the new DPR.
          */
-        danma.mode7RenderedCache = new WeakMap();
-        danma.mode7SpriteCache.clear();
-        danma.renderCache.clear();
+        dankoma.mode7RenderedCache = new WeakMap();
+        dankoma.mode7SpriteCache.clear();
+        dankoma.renderCache.clear();
     }
 
     if (path === "laneHeight") {
-        danma.rebuildLanes();
+        dankoma.rebuildLanes();
         renderSettings();
     }
 }
@@ -173,7 +173,7 @@ function renderSettings() {
 
     list.replaceChildren();
 
-    for (const setting of flattenConfig(danma.config)) {
+    for (const setting of flattenConfig(dankoma.config)) {
         list.appendChild(
             createSettingControl(
                 setting.path,

@@ -32,16 +32,16 @@ video.addEventListener("pause", showControls);
 showControls();
 
 canvasToggle.addEventListener("click", () => {
-    danma.drawEnabled = !danma.drawEnabled;
+    dankoma.drawEnabled = !dankoma.drawEnabled;
 
-    canvas.style.display = danma.drawEnabled
+    canvas.style.display = dankoma.drawEnabled
         ? "block"
         : "none";
 
-    if (danma.drawEnabled) {
-        danma.unhide();
+    if (dankoma.drawEnabled) {
+        dankoma.unhide();
     } else {
-        danma.hide();
+        dankoma.hide();
     }
 });
 
