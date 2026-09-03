@@ -21,6 +21,49 @@ const samples = [
     }
 ];
 
+const fontFiles = {
+    "Microsoft YaHei": "fonts/chinese.msyh.ttf",
+    "MS Mincho": "fonts/MSMINCHO.TTF",
+    "SimHei": "fonts/SimHei.ttf",
+};
+
+const missingFonts = new Set();
+
+dankoma.onMissingFont(fontname => {
+    missingFonts.add(fontname);
+});
+
+async function loadMissingFonts() {
+    const fonts = [...missingFonts];
+    missingFonts.clear();
+
+    await Promise.all(
+        fonts.map(async fontname => {
+            const url = fontFiles[fontname];
+
+            if (!url) {
+                console.warn(`Missing font: ${fontname}`);
+                return;
+            }
+
+            const font = new FontFace(
+                fontname,
+                `url("${url}")`,
+            );
+
+            try {
+                await font.load();
+                document.fonts.add(font);
+            } catch (error) {
+                console.error(
+                    `Failed to load font "${fontname}":`,
+                    error,
+                );
+            }
+        }),
+    );
+}
+
 const overlay = document.createElement("div");
 
 overlay.innerHTML = `
@@ -227,6 +270,10 @@ async function load(videoSource, danmakuSource) {
     const danmakuBlob = await loadDanmakuSource(danmakuSource);
 
     await dankoma.loadDanmaJSONL(danmakuBlob);
+
+    status.textContent = "Loading fonts...";
+
+    await loadMissingFonts();
 
     overlay.remove();
 }
