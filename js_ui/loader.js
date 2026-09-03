@@ -37,7 +37,7 @@ overlay.innerHTML = `
             <input
                 id="danmakuFile"
                 type="file"
-                accept=".jsonl,.json,text/plain"
+                accept=".jsonl,.json,.gz,text/plain,application/json,application/gzip"
             >
         </label>
 
@@ -163,6 +163,56 @@ const danmakuFile = overlay.querySelector("#danmakuFile");
 const loadButton = overlay.querySelector("#loadButton");
 const status = overlay.querySelector("#loaderStatus");
 
+async function decompressGzip(blob) {
+    if (!("DecompressionStream" in window)) {
+        throw new Error(
+            "This browser does not support gzip decompression."
+        );
+    }
+
+    const stream = blob.stream().pipeThrough(
+        new DecompressionStream("gzip")
+    );
+
+    return new Response(stream).blob();
+}
+
+async function loadDanmakuSource(source) {
+    let blob;
+
+    if (source instanceof Blob) {
+        blob = source;
+    } else if (typeof source === "string") {
+        const response = await fetch(source);
+
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch danmaku: ${response.status} ${response.statusText}`
+            );
+        }
+
+        blob = await response.blob();
+    } else {
+        throw new TypeError("Unsupported danmaku source.");
+    }
+
+    // Gzip header
+    const header = new Uint8Array(
+        await blob.slice(0, 2).arrayBuffer()
+    );
+
+    const isGzip =
+        header.length >= 2 &&
+        header[0] === 0x1f &&
+        header[1] === 0x8b;
+
+    if (isGzip) {
+        blob = await decompressGzip(blob);
+    }
+
+    return blob;
+}
+
 async function load(videoSource, danmakuSource) {
     if (typeof videoSource === "string") {
         video.src = videoSource;
@@ -173,7 +223,10 @@ async function load(videoSource, danmakuSource) {
     video.load();
 
     dankoma.trackVideo(video);
-    await dankoma.loadDanmaJSONL(danmakuSource);
+
+    const danmakuBlob = await loadDanmakuSource(danmakuSource);
+
+    await dankoma.loadDanmaJSONL(danmakuBlob);
 
     overlay.remove();
 }
