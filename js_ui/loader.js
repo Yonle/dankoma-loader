@@ -7,27 +7,39 @@ const samples = [
     {
         name: "CONNECT - 阿良良木健 [BV1Yx411T7Uz]",
         video: "https://pcf.waltuh.cyou/danma/dm_vid/9/vid.mp4",
-        danmaku: "https://pcf.waltuh.cyou/danma/dm_vid/9/danma.json.gz"
+        danmaku: [
+            "https://pcf.waltuh.cyou/danma/dm_vid/9/danma-seg1.json.gz",
+            "https://pcf.waltuh.cyou/danma/dm_vid/9/danma-seg2.json.gz",
+        ],
     },
     {
         name: "UP↑SIDE↓UP↑SIDE↓DOWN↓ [BV1da411U7PE]",
         video: "https://pcf.waltuh.cyou/danma/dm_vid/12/vid.mp4",
-        danmaku: "https://pcf.waltuh.cyou/danma/dm_vid/12/danma.json.gz",
+        danmaku: [
+            "https://pcf.waltuh.cyou/danma/dm_vid/12/danma.json.gz",
+        ],
     },
     {
         name: "緋色月下、狂咲ノ絶 [BV1qx411c772]",
         video: "https://pcf.waltuh.cyou/danma/dm_vid/3/vid.mp4",
-        danmaku: "https://pcf.waltuh.cyou/danma/dm_vid/3/danma.json.gz"
+        danmaku: [
+            "https://pcf.waltuh.cyou/danma/dm_vid/3/danma-seg1.json.gz",
+            "https://pcf.waltuh.cyou/danma/dm_vid/3/danma-seg2.json.gz",
+        ],
     },
     {
         name: "佩佩角色PV [BV1Sf421q7dN]",
         video: "https://pcf.waltuh.cyou/danma/dm_vid/5/vid.mp4",
-        danmaku: "https://pcf.waltuh.cyou/danma/dm_vid/5/danma.json.gz"
-    }
+        danmaku: [
+            "https://pcf.waltuh.cyou/danma/dm_vid/5/danma-seg1.json.gz",
+            "https://pcf.waltuh.cyou/danma/dm_vid/5/danma-seg2.json.gz",
+        ],
+    },
 ];
 
 const fontFiles = {
-    "Microsoft YaHei": "fonts/chinese.msyh.ttf",
+    "Microsoft YaHei": "fonts/msyh.ttc",
+    "Microsoft JhengHei": "fonts/msjh.ttf",
     "MS Mincho": "fonts/MSMINCHO.TTF",
     "SimHei": "fonts/SimHei.ttf",
 };
@@ -40,6 +52,7 @@ dankoma.onMissingFont(fontname => {
 
 async function loadMissingFonts() {
     const fonts = [...missingFonts];
+
     missingFonts.clear();
 
     await Promise.all(
@@ -77,19 +90,26 @@ overlay.innerHTML = `
 
         <label>
             Video
-            <input id="videoFile" type="file" accept="video/*">
+            <input
+                id="videoFile"
+                type="file"
+                accept="video/*"
+            >
         </label>
 
         <label>
-            Dankoma JSONL
+            Dankoma JSONL segments
             <input
                 id="danmakuFile"
                 type="file"
+                multiple
                 accept=".jsonl,.json,.gz,text/plain,application/json,application/gzip"
             >
         </label>
 
-        <button id="loadButton" type="button">Load</button>
+        <button id="loadButton" type="button">
+            Load
+        </button>
 
         ${
             samples.length
@@ -147,7 +167,7 @@ loader.querySelectorAll("input").forEach(input => {
     `;
 });
 
-loader.querySelector("button").style.cssText = `
+loader.querySelector("#loadButton").style.cssText = `
     width: 100%;
     margin-top: 12px;
     padding: 8px;
@@ -241,10 +261,12 @@ async function loadDanmakuSource(source) {
 
         blob = await response.blob();
     } else {
-        throw new TypeError("Unsupported danmaku source.");
+        throw new TypeError(
+            "Unsupported danmaku source."
+        );
     }
 
-    // Gzip header
+    // Check for gzip magic header.
     const header = new Uint8Array(
         await blob.slice(0, 2).arrayBuffer()
     );
@@ -261,7 +283,8 @@ async function loadDanmakuSource(source) {
     return blob;
 }
 
-async function load(videoSource, danmakuSource) {
+
+async function load(videoSource, danmakuSources) {
     if (typeof videoSource === "string") {
         video.src = videoSource;
     } else {
@@ -272,9 +295,28 @@ async function load(videoSource, danmakuSource) {
 
     dankoma.trackVideo(video);
 
-    const danmakuBlob = await loadDanmakuSource(danmakuSource);
+    if (!Array.isArray(danmakuSources)) {
+        danmakuSources = [danmakuSources];
+    }
 
-    await dankoma.loadDanmaJSONL(danmakuBlob);
+    if (!danmakuSources.length) {
+        throw new Error(
+            "No danmaku segments were provided."
+        );
+    }
+
+    for (let i = 0; i < danmakuSources.length; i++) {
+        const source = danmakuSources[i];
+
+        status.textContent =
+            `Loading danmaku segment ${i + 1}/${danmakuSources.length}...`;
+
+        const danmakuBlob =
+            await loadDanmakuSource(source);
+
+        await dankoma.loadDanmaJSONL(danmakuBlob);
+    }
+
 
     status.textContent = "Loading fonts...";
 
@@ -285,34 +327,54 @@ async function load(videoSource, danmakuSource) {
 
 async function loadSample(sample) {
     loadButton.disabled = true;
-    status.textContent = `Loading ${sample.name}...`;
+
+    status.textContent =
+        `Loading ${sample.name}...`;
 
     try {
-        await load(sample.video, sample.danmaku);
+        await load(
+            sample.video,
+            sample.danmaku,
+        );
     } catch (error) {
         console.error(error);
-        status.textContent = `Failed to load sample: ${error.message}`;
+
+        status.textContent =
+            `Failed to load sample: ${error.message}`;
+
         loadButton.disabled = false;
     }
 }
 
 loadButton.addEventListener("click", async () => {
     const videoSource = videoFile.files[0];
-    const danmakuSource = danmakuFile.files[0];
 
-    if (!videoSource || !danmakuSource) {
-        status.textContent = "Select both files.";
+    const danmakuSources = [
+        ...danmakuFile.files,
+    ];
+
+    if (!videoSource || !danmakuSources.length) {
+        status.textContent =
+            "Select the video and at least one danmaku segment.";
+
         return;
     }
 
     loadButton.disabled = true;
+
     status.textContent = "Loading...";
 
     try {
-        await load(videoSource, danmakuSource);
+        await load(
+            videoSource,
+            danmakuSources,
+        );
     } catch (error) {
         console.error(error);
-        status.textContent = `Failed to load: ${error.message}`;
+
+        status.textContent =
+            `Failed to load: ${error.message}`;
+
         loadButton.disabled = false;
     }
 });
