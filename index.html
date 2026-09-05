@@ -1,298 +1,163 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#00aeec">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#00aeec">
 
-<title>Dankoma.js Web Loader</title>
-<meta name="description" content="Dankoma.js Web Loader: load and play Bilibili-style danmaku with HTML Canvas.">
-<style>
-  @font-face {
-    font-family: "Microsoft YaHei";
-    src: url("./fonts/msyh.ttc") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-  }
+    <title>DankomaP</title>
 
-  @font-face {
-    font-family: "Microsoft JhengHei";
-    src: url("./fonts/msjh.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: "MS Mincho";
-    src: url("./fonts/MSMINCHO.TTF") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: "SimHei";
-    src: url("./fonts/SimHei.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  :root {
-    --bilibili-blue: #00aeec;
-  }
-
-  input[type="range"] {
-    accent-color: var(--bilibili-blue);
-  }
-
-  html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #111;
-    color: white;
-    font-family: system-ui, sans-serif;
-  }
-
-  canvas, video {
-    position: fixed;
-    display: block;
-    width: 100vw;
-    height: 100vh;
-    left: 0;
-    top: 0;
-  }
-
-  canvas {
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  #controls {
-    position: fixed;
-    z-index: 10;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 10px 12px;
-
-    box-sizing: border-box;
-
-    background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.8),
-        rgba(0, 0, 0, 0)
-    );
-  }
-
-  #controls button {
-      flex: 0 0 auto;
-
-      width: 36px;
-      height: 36px;
-
-      padding: 0;
-
-      border: 0;
-      border-radius: 4px;
-
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-
-      font-size: 18px;
-
-      cursor: pointer;
-  }
-
-  #controls button:hover {
-      background: rgba(255, 255, 255, 0.2);
-  }
-
-  #seekbar {
-      flex: 1 1 auto;
-      min-width: 0;
-  }
-
-  #volume {
-      flex: 0 1 100px;
-      width: 100px;
-      min-width: 0;
-  }
-
-  .settings-popup {
-    position: fixed;
-    z-index: 20;
-
-    right: 12px;
-    bottom: 60px;
-
-    width: 320px;
-    max-height: 70vh;
-
-    overflow-y: auto;
-
-    background: rgba(20, 20, 20, 0.96);
-    color: white;
-
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-
-    box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.5);
-  }
-
-  .settings-header {
-      position: sticky;
-      top: 0;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      padding: 10px 12px;
-
-      background: rgba(20, 20, 20, 0.98);
-
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-      font-weight: 600;
-  }
-
-  .settings-header button {
-      width: 28px;
-      height: 28px;
-
-      border: 0;
-      background: transparent;
-      color: white;
-
-      font-size: 20px;
-      cursor: pointer;
-  }
-
-  .settings-list {
-      padding: 8px;
-  }
-
-  .setting {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      padding: 8px 4px;
-  }
-
-  .setting-info {
-      flex: 1;
-      min-width: 0;
-  }
-
-  .setting-name {
-      font-size: 13px;
-      font-weight: 600;
-
-      word-break: break-word;
-  }
-
-  .setting-desc {
-      margin-top: 2px;
-
-      font-size: 11px;
-      opacity: 0.55;
-  }
-
-  .setting input[type="number"],
-  .setting input[type="text"] {
-      width: 90px;
-
-      box-sizing: border-box;
-
-      padding: 5px 6px;
-
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-
-      background: rgba(255, 255, 255, 0.08);
-      color: white;
-  }
-
-  .setting input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-  }
-
-  .setting select {
-      max-width: 130px;
-
-      padding: 5px;
-
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-
-      background: #222;
-      color: white;
-  }
-
-  #controls {
-      transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-
-  #controls.hidden {
-      opacity: 0;
-      transform: translateY(100%);
-      pointer-events: none;
-  }
-</style>
+    <meta name="description" content="Dankoma.js Web Loader: load and play Bilibili-style danmaku with HTML Canvas.">
+    
+    <link rel="stylesheet" href="css/root.css" />
+    <link rel="stylesheet" href="css/fonts.css" />
+    <link rel="stylesheet" href="css/loader.css" />
+    <link rel="stylesheet" href="css/player.css" />
+    <link rel="stylesheet" href="css/nmmenu.css" />
+    <link rel="stylesheet" href="css/settings.css" />
+    <link rel="stylesheet" href="css/web_samples.css">
 </head>
 <body>
+<div id="loaderOverlay" hidden>
+    <div id="loader" class="loader">
+        <h2>Load video</h2>
 
-<video></video>
+        <label class="drop-zone" for="videoFile">
+            <strong>Video</strong>
+            <span>
+                Click or drag a video file here
+            </span>
 
-<div id="controls">
-    <button id="playPause" type="button">▶</button>
-    <button id="canvasToggle" type="button">DM</button>
+            <input
+                id="videoFile"
+                type="file"
+                accept="video/*"
+            >
+        </label>
 
-    <input
-        id="seekbar"
-        type="range"
-        min="0"
-        max="100"
-        value="0"
-        step="0.01"
-    >
+        <label class="drop-zone" for="danmakuFile">
+            <strong>Dankoma JSONL segments</strong>
+            <span>
+                Click or drag JSONL segment files here
+            </span>
 
-    <input
-        id="volume"
-        type="range"
-        min="0"
-        max="1"
-        value="1"
-        step="0.01"
-    >
+            <input
+                id="danmakuFile"
+                type="file"
+                multiple
+                accept="
+                    .jsonl,
+                    .json,
+                    .gz,
+                    text/plain,
+                    application/json,
+                    application/gzip
+                "
+            >
+        </label>
 
-    <button id="settings" type="button">⚙</button>
-    <button id="fullscreen" type="button">⛶</button>
-    <div id="settingsPopup" class="settings-popup" hidden>
-      <div class="settings-header">
-          <span>Settings</span>
-          <button id="settingsClose" type="button">×</button>
-      </div>
+        <div id="samples">
+            <h3>Samples</h3>
 
-      <div id="settingsList" class="settings-list"></div>
+            <div id="sampleList"></div>
+        </div>
+
+        <div class="loader-actions">
+            <button
+                id="loadButton"
+                type="button"
+            >
+                Load
+            </button>
+
+            <button
+                id="cancelButton"
+                type="button"
+            >
+                Cancel
+            </button>
+        </div>
+
+        <div id="loaderStatus"></div>
     </div>
 </div>
 
-<canvas id="danmaku"></canvas>
+<div id="nwMenuBar">
+    <div class="menu">
+        <button class="menu-button" type="button">
+            File
+        </button>
 
-<script src="https://cdn.jsdelivr.net/npm/dankoma.js@0.1.3"></script>
-<script src="js_ui/loader.js" type="module"></script>
-<script src="js_ui/videocontrol.js" type="module"></script>
-<script src="js_ui/settings_ui.js" type="module"></script>
+        <div class="menu-popup">
+            <button
+                class="menu-item"
+                type="button"
+                data-action="load"
+            >
+                Load...
+            </button>
+        </div>
+    </div>
+
+    <div class="menu">
+        <button class="menu-button" type="button">
+            Help
+        </button>
+
+        <div class="menu-popup">
+            <button
+                class="menu-item"
+                type="button"
+                data-action="about"
+            >
+                About
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="player">
+    <video></video>
+    <canvas id="danmaku"></canvas>
+
+    <div id="controls">
+        <button id="playPause" type="button">▶</button>
+        <button id="canvasToggle" type="button">DM</button>
+
+        <input
+            id="seekbar"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            step="0.01"
+        >
+
+        <span id="duration">0:00 / 0:00</span>
+
+        <input
+            id="volume"
+            type="range"
+            min="0"
+            max="1"
+            value="1"
+            step="0.01"
+        >
+
+        <button id="settings" type="button">⚙</button>
+        <button id="fullscreen" type="button">⛶</button>
+
+        <div id="settingsPopup" class="settings-popup" hidden>
+            <div class="settings-header">
+                <span>Settings</span>
+                <button id="settingsClose" type="button">×</button>
+            </div>
+
+            <div id="settingsList" class="settings-list"></div>
+        </div>
+    </div>
+</div>
+
+<script src="js_ui/bootstrap.js" type="module"></script>
 </body>
 </html>

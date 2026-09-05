@@ -1,0 +1,49 @@
+
+#samples {
+    margin-top: 20px;
+}
+
+#samples h3 {
+    margin: 0 0 10px;
+
+    font-size: 14px;
+}
+
+#sampleList {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    max-height: 220px;
+
+    overflow-y: auto;
+}
+
+.sample-button {
+    width: 100%;
+
+    padding: 9px 10px;
+
+    border: 0;
+    border-radius: 5px;
+
+    background: #333;
+    color: white;
+
+    font: inherit;
+    font-size: 12px;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.sample-button:hover {
+    background: #444;
+}
+
+.sample-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
