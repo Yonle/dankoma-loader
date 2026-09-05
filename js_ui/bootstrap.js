@@ -18,40 +18,6 @@ function loadScript(src) {
     });
 }
 
-function setupWebMenu() {
-    const menuBar =
-        document.querySelector("#nwMenuBar");
-
-    if (!menuBar) {
-        return;
-    }
-
-    menuBar.replaceChildren();
-
-    const menu = document.createElement("div");
-
-    menu.className = "menu";
-
-    menu.innerHTML = `
-        <button
-            class="menu-button"
-            type="button"
-        >
-            Get DankomaP for Windows/Linux/Mac!
-        </button>
-    `;
-
-    menuBar.appendChild(menu);
-
-    menu.querySelector(".menu-button")
-        .addEventListener("click", () => {
-            window.open(
-                "https://github.com/Yonle/dankomap/releases",
-                "_blank",
-            );
-        });
-}
-
 async function main() {
     const dankoma = isNW
         ? "../modules/dankoma.js/js/dankoma.js"
@@ -70,10 +36,10 @@ async function main() {
     }
 
     await import("./web_samples.js");
-
+    
+    const { setupWebMenu } = await import("./advert_desktopapp.js");
     const { openLoader } = await import("./nwloader.js");
     openLoader()
-
     setupWebMenu()
 }
 
