@@ -1,4 +1,5 @@
 import { openLoader } from "./nwloader.js";
+import { openAbout } from "./about.js";
 
 const menuBar = document.querySelector("#nwMenuBar");
 
@@ -55,10 +56,7 @@ menuBar.addEventListener("click", event => {
             break;
 
         case "about":
-            alert(
-                "Dankoma.js\n\n" +
-                "A Bilibili-style danmaku renderer."
-            );
+            openAbout();
             break;
     }
 });

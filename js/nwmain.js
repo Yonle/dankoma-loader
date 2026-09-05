@@ -1,10 +1,50 @@
 import { load, video } from "./player.js";
 import { openLoader } from "../js_ui/nwloader.js";
+
 import {
     getArguments,
     pathToURL,
     onOpen,
 } from "./nwhelper.js";
+
+const fs = require("node:fs/promises");
+const path = require("node:path");
+
+const DANMAKU_EXTENSIONS = [
+    ".dankoma.json",
+    ".dankoma.jsonl",
+    ".dankoma.json.gz",
+    ".dankoma.jsonl.gz",
+];
+
+async function findDanmakuFile(videoPath) {
+    const directory =
+        path.dirname(videoPath);
+
+    const filename =
+        path.basename(videoPath);
+
+    for (const extension of DANMAKU_EXTENSIONS) {
+        const candidate =
+            path.join(
+                directory,
+                filename.replace(
+                    path.extname(filename),
+                    "",
+                ) + extension,
+            );
+
+        try {
+            await fs.access(candidate);
+
+            return candidate;
+        } catch {
+            // Doesn't exist. Try the next extension.
+        }
+    }
+
+    return null;
+}
 
 async function loadArguments(args) {
     if (!args.length) {
@@ -12,23 +52,53 @@ async function loadArguments(args) {
         return;
     }
 
-    const [videoPath, ...danmakuPaths] = args;
+    const [
+        videoPath,
+        ...danmakuPaths
+    ] = args;
 
-    if (!videoPath || !danmakuPaths.length) {
-        openLoader();
-        return;
+    if (danmakuPaths.length) {
+        try {
+            await load(
+                pathToURL(videoPath),
+                danmakuPaths.map(pathToURL),
+            );
+
+            video.play();
+
+            return;
+        } catch (error) {
+            console.error(
+                "Failed to load command-line files:",
+                error,
+            );
+
+            openLoader();
+
+            return;
+        }
     }
 
     try {
-        const videoSource =
-            pathToURL(videoPath);
+        const danmakuPath =
+            await findDanmakuFile(videoPath);
 
-        const danmakuSources =
-            danmakuPaths.map(pathToURL);
+        if (!danmakuPath) {
+            console.warn(
+                "No matching Dankoma file found for:",
+                videoPath,
+            );
+
+            openLoader();
+
+            return;
+        }
 
         await load(
-            videoSource,
-            danmakuSources,
+            pathToURL(videoPath),
+            [
+                pathToURL(danmakuPath),
+            ],
         );
 
         video.play();
