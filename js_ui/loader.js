@@ -1,7 +1,4 @@
-const video = document.querySelector("video");
-const canvas = document.querySelector("#danmaku");
-
-const dankoma = new Dankoma(canvas);
+import { load } from "../js/player.js";
 
 const samples = [
     {
@@ -36,51 +33,6 @@ const samples = [
         ],
     },
 ];
-
-const fontFiles = {
-    "Microsoft YaHei": "fonts/msyh.ttc",
-    "Microsoft JhengHei": "fonts/msjh.ttf",
-    "MS Mincho": "fonts/MSMINCHO.TTF",
-    "SimHei": "fonts/SimHei.ttf",
-};
-
-const missingFonts = new Set();
-
-dankoma.onMissingFont(fontname => {
-    missingFonts.add(fontname);
-});
-
-async function loadMissingFonts() {
-    const fonts = [...missingFonts];
-
-    missingFonts.clear();
-
-    await Promise.all(
-        fonts.map(async fontname => {
-            const url = fontFiles[fontname];
-
-            if (!url) {
-                console.warn(`Missing font: ${fontname}`);
-                return;
-            }
-
-            const font = new FontFace(
-                fontname,
-                `url("${url}")`,
-            );
-
-            try {
-                await font.load();
-                document.fonts.add(font);
-            } catch (error) {
-                console.error(
-                    `Failed to load font "${fontname}":`,
-                    error,
-                );
-            }
-        }),
-    );
-}
 
 const overlay = document.createElement("div");
 
@@ -167,7 +119,9 @@ loader.querySelectorAll("input").forEach(input => {
     `;
 });
 
-loader.querySelector("#loadButton").style.cssText = `
+const loadButton = loader.querySelector("#loadButton");
+
+loadButton.style.cssText = `
     width: 100%;
     margin-top: 12px;
     padding: 8px;
@@ -211,14 +165,37 @@ if (samplesElement) {
         `;
 
         button.addEventListener("click", async () => {
-            await loadSample(sample);
+            button.disabled = true;
+            loadButton.disabled = true;
+
+            status.textContent =
+                `Loading ${sample.name}...`;
+
+            try {
+                await load(
+                    sample.video,
+                    sample.danmaku,
+                );
+
+                overlay.remove();
+            } catch (error) {
+                console.error(error);
+
+                status.textContent =
+                    `Failed to load sample: ${error.message}`;
+
+                button.disabled = false;
+                loadButton.disabled = false;
+            }
         });
 
         samplesElement.appendChild(button);
     }
 }
 
-loader.querySelector("#loaderStatus").style.cssText = `
+const status = overlay.querySelector("#loaderStatus");
+
+status.style.cssText = `
     margin-top: 10px;
     font-size: 12px;
     opacity: 0.7;
@@ -228,123 +205,6 @@ document.body.appendChild(overlay);
 
 const videoFile = overlay.querySelector("#videoFile");
 const danmakuFile = overlay.querySelector("#danmakuFile");
-const loadButton = overlay.querySelector("#loadButton");
-const status = overlay.querySelector("#loaderStatus");
-
-async function decompressGzip(blob) {
-    if (!("DecompressionStream" in window)) {
-        throw new Error(
-            "This browser does not support gzip decompression."
-        );
-    }
-
-    const stream = blob.stream().pipeThrough(
-        new DecompressionStream("gzip")
-    );
-
-    return new Response(stream).blob();
-}
-
-async function loadDanmakuSource(source) {
-    let blob;
-
-    if (source instanceof Blob) {
-        blob = source;
-    } else if (typeof source === "string") {
-        const response = await fetch(source);
-
-        if (!response.ok) {
-            throw new Error(
-                `Failed to fetch danmaku: ${response.status} ${response.statusText}`
-            );
-        }
-
-        blob = await response.blob();
-    } else {
-        throw new TypeError(
-            "Unsupported danmaku source."
-        );
-    }
-
-    // Check for gzip magic header.
-    const header = new Uint8Array(
-        await blob.slice(0, 2).arrayBuffer()
-    );
-
-    const isGzip =
-        header.length >= 2 &&
-        header[0] === 0x1f &&
-        header[1] === 0x8b;
-
-    if (isGzip) {
-        blob = await decompressGzip(blob);
-    }
-
-    return blob;
-}
-
-
-async function load(videoSource, danmakuSources) {
-    if (typeof videoSource === "string") {
-        video.src = videoSource;
-    } else {
-        video.src = URL.createObjectURL(videoSource);
-    }
-
-    video.load();
-
-    dankoma.trackVideo(video);
-
-    if (!Array.isArray(danmakuSources)) {
-        danmakuSources = [danmakuSources];
-    }
-
-    if (!danmakuSources.length) {
-        throw new Error(
-            "No danmaku segments were provided."
-        );
-    }
-
-    for (let i = 0; i < danmakuSources.length; i++) {
-        const source = danmakuSources[i];
-
-        status.textContent =
-            `Loading danmaku segment ${i + 1}/${danmakuSources.length}...`;
-
-        const danmakuBlob =
-            await loadDanmakuSource(source);
-
-        await dankoma.loadDanmaJSONL(danmakuBlob);
-    }
-
-
-    status.textContent = "Loading fonts...";
-
-    await loadMissingFonts();
-
-    overlay.remove();
-}
-
-async function loadSample(sample) {
-    loadButton.disabled = true;
-
-    status.textContent =
-        `Loading ${sample.name}...`;
-
-    try {
-        await load(
-            sample.video,
-            sample.danmaku,
-        );
-    } catch (error) {
-        console.error(error);
-
-        status.textContent =
-            `Failed to load sample: ${error.message}`;
-
-        loadButton.disabled = false;
-    }
-}
 
 loadButton.addEventListener("click", async () => {
     const videoSource = videoFile.files[0];
@@ -369,6 +229,8 @@ loadButton.addEventListener("click", async () => {
             videoSource,
             danmakuSources,
         );
+
+        overlay.remove();
     } catch (error) {
         console.error(error);
 

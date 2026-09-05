@@ -1,3 +1,5 @@
+import { video, dankoma } from "../js/player.js";
+
 const playPause = document.getElementById("playPause");
 const seekbar = document.getElementById("seekbar");
 const volume = document.getElementById("volume");
