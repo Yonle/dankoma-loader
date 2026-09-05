@@ -1,0 +1,173 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 640 640"
+>
+    <!-- Wind -->
+    <g
+        fill="none"
+        stroke="#66CCFF"
+        stroke-linecap="round"
+    >
+        <path
+            d="M54 214
+               C128 177 202 181 267 211"
+            stroke-width="11"
+            opacity="0.62"
+        />
+
+        <path
+            d="M32 268
+               C108 235 171 239 227 264"
+            stroke-width="8"
+            opacity="0.46"
+        />
+
+        <path
+            d="M76 319
+               C127 297 172 301 211 320"
+            stroke-width="6"
+            opacity="0.34"
+        />
+    </g>
+
+    <!-- Stem -->
+    <path
+        d="M337 320
+           C348 356 349 390 336 425
+           C323 460 295 491 250 524"
+        fill="none"
+        stroke="#3AAFE6"
+        stroke-width="23"
+        stroke-linecap="round"
+    />
+
+    <!-- Leaves -->
+    <path
+        d="M328 423
+           C281 397 232 401 196 430
+           C239 449 285 451 328 423
+           Z"
+        fill="#3AAFE6"
+    />
+
+    <path
+        d="M323 466
+           C366 438 411 442 445 466
+           C407 491 365 493 323 466
+           Z"
+        fill="#3AAFE6"
+    />
+
+    <!-- Flower -->
+    <g transform="rotate(-9 304 247)">
+        <!-- Rear-left petal -->
+        <path
+            d="M282 236
+               C229 229 178 190 184 143
+               C190 99 234 76 272 99
+               C304 119 315 161 303 202
+               C298 218 291 229 282 236
+               Z"
+            fill="#66CCFF"
+        />
+
+        <!-- Rear-right petal -->
+        <path
+            d="M322 236
+               C377 229 428 190 422 143
+               C416 99 372 76 334 99
+               C302 119 291 161 303 202
+               C308 218 315 229 322 236
+               Z"
+            fill="#66CCFF"
+        />
+
+        <!-- Left petal -->
+        <path
+            d="M285 222
+               C245 186 183 170 143 194
+               C105 216 104 264 137 289
+               C172 316 230 305 272 271
+               C284 261 291 244 285 222
+               Z"
+            fill="#66CCFF"
+        />
+
+        <!-- Right petal -->
+        <path
+            d="M323 222
+               C363 186 425 170 465 194
+               C503 216 504 264 471 289
+               C436 316 378 305 336 271
+               C324 261 317 244 323 222
+               Z"
+            fill="#66CCFF"
+        />
+
+        <!-- Bottom-left petal -->
+        <path
+            d="M282 257
+               C240 280 214 329 230 368
+               C247 409 293 421 323 390
+               C350 361 346 312 317 271
+               C307 257 294 252 282 257
+               Z"
+            fill="#66CCFF"
+        />
+
+        <!-- Bottom-right petal -->
+        <path
+            d="M326 257
+               C368 280 394 329 378 368
+               C361 409 315 421 285 390
+               C258 361 262 312 291 271
+               C301 257 314 252 326 257
+               Z"
+            fill="#66CCFF"
+        />
+
+        <!-- Unified flower center -->
+        <circle
+            cx="304"
+            cy="247"
+            r="48"
+            fill="#FFFFFF"
+        />
+
+        <!-- Center detail -->
+        <circle
+            cx="304"
+            cy="247"
+            r="18"
+            fill="#66CCFF"
+        />
+    </g>
+
+    <!-- Drifting petals -->
+    <path
+        d="M490 141
+           C507 129 529 136 534 153
+           C518 165 500 161 490 141
+           Z"
+        fill="#66CCFF"
+        opacity="0.72"
+    />
+
+    <path
+        d="M548 207
+           C562 198 579 202 584 216
+           C572 226 556 224 548 207
+           Z"
+        fill="#66CCFF"
+        opacity="0.52"
+    />
+
+    <path
+        d="M115 132
+           C128 121 147 125 153 138
+           C140 149 123 147 115 132
+           Z"
+        fill="#66CCFF"
+        opacity="0.4"
+    />
+</svg>
