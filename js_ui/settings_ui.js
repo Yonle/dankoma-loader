@@ -1,3 +1,5 @@
+import { dankoma } from "../js/player.js";
+
 let settingsDescriptions = {};
 
 async function loadSettingsDescriptions() {
