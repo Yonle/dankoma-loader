@@ -1,0 +1,27 @@
+@font-face {
+    font-family: "Microsoft YaHei";
+    src: url("./fonts/msyh.ttc") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Microsoft JhengHei";
+    src: url("./fonts/msjh.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "MS Mincho";
+    src: url("./fonts/MSMINCHO.TTF") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SimHei";
+    src: url("./fonts/SimHei.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}

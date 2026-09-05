@@ -1,0 +1,183 @@
+#loaderOverlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 100;
+
+    display: grid;
+    place-items: center;
+
+    padding: 16px;
+    box-sizing: border-box;
+
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+
+    font-family: system-ui, sans-serif;
+}
+
+#loaderOverlay[hidden] {
+    display: none;
+}
+
+#loader {
+    width: min(520px, 100%);
+
+    padding: 24px;
+
+    box-sizing: border-box;
+
+    background: #1c1c1c;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+#loader h2 {
+    margin: 0 0 20px;
+}
+
+/* File drop zones */
+
+.drop-zone {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 120px;
+
+    margin: 12px 0;
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    border: 2px dashed rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    text-align: center;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: #00aeec;
+
+    background: rgba(0, 174, 236, 0.1);
+}
+
+.drop-zone strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 15px;
+    line-height: 1.4;
+
+    pointer-events: none;
+}
+
+.drop-zone span {
+    display: block;
+
+    max-width: 100%;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    opacity: 0.7;
+
+    overflow-wrap: anywhere;
+
+    pointer-events: none;
+}
+
+.drop-zone input[type="file"] {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    opacity: 0;
+
+    cursor: pointer;
+}
+
+/* Buttons */
+
+.loader-actions {
+    display: flex;
+    gap: 8px;
+
+    margin-top: 16px;
+}
+
+.loader-actions button {
+    flex: 1;
+
+    min-height: 42px;
+
+    padding: 8px 16px;
+
+    border: 0;
+    border-radius: 5px;
+
+    font: inherit;
+    font-size: 14px;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+#loadButton {
+    background: #00aeec;
+}
+
+#loadButton:hover {
+    background: #009bd3;
+}
+
+#cancelButton {
+    background: #333;
+}
+
+#cancelButton:hover {
+    background: #444;
+}
+
+.loader-actions button:disabled {
+    opacity: 0.5;
+
+    cursor: default;
+}
+
+/* Status */
+
+#loaderStatus {
+    min-height: 18px;
+
+    margin-top: 10px;
+
+    font-size: 12px;
+
+    opacity: 0.7;
+}

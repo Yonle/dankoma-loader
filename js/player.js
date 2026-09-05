@@ -118,6 +118,9 @@ export async function load(videoSource, danmakuSources) {
         );
     }
 
+    dankoma.clearDanmakus();
+    dankoma.resetDanmakuData();
+
     for (const source of danmakuSources) {
         const danmakuBlob =
             await loadDanmakuSource(source);

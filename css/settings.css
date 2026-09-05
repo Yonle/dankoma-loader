@@ -1,0 +1,113 @@
+.settings-popup {
+    position: fixed;
+    z-index: 20;
+
+    right: 12px;
+    bottom: 60px;
+
+    width: 320px;
+    max-height: 70vh;
+
+    overflow-y: auto;
+
+    background: rgba(20, 20, 20, 0.96);
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.settings-header {
+    position: sticky;
+    top: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 12px;
+
+    background: rgba(20, 20, 20, 0.98);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    font-weight: 600;
+}
+
+.settings-header button {
+    width: 28px;
+    height: 28px;
+
+    border: 0;
+    background: transparent;
+    color: white;
+
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.settings-list {
+    padding: 8px;
+}
+
+.setting {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 8px 4px;
+}
+
+.setting-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.setting-name {
+    font-size: 13px;
+    font-weight: 600;
+
+    word-break: break-word;
+}
+
+.setting-desc {
+    margin-top: 2px;
+
+    font-size: 11px;
+    opacity: 0.55;
+}
+
+.setting input[type="number"],
+.setting input[type="text"] {
+    width: 90px;
+
+    box-sizing: border-box;
+
+    padding: 5px 6px;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.setting input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.setting select {
+    max-width: 130px;
+
+    padding: 5px;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+
+    background: #222;
+    color: white;
+}
