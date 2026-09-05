@@ -32,6 +32,7 @@ async function main() {
     if (isNW) {
         await import("./nwmenu.js");
         await import("../js/nwmain.js");
+        await import("./converterUI.js")
         return
     }
 

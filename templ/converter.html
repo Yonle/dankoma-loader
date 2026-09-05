@@ -1,0 +1,40 @@
+<div class="loaderOverlay" hidden>
+    <div class="loader converter">
+        <h2>Convert danmaku</h2>
+        <p>Platform: <span id="convPName"></span></p>
+
+        <label class="drop-zone" for="converterFile">
+            <strong>Comments</strong>
+            <span id="converterFileHint">
+                Select a converter first
+            </span>
+
+            <input
+                id="converterFile"
+                type="file"
+            >
+        </label>
+
+        <div class="loader-actions">
+            <button
+                id="converterButton"
+                type="button"
+                class="buttonh"
+            >
+                Convert
+            </button>
+
+            <button
+                id="converterCancelButton"
+                type="button"
+            >
+                Cancel
+            </button>
+        </div>
+
+        <div
+            id="converterStatus"
+            class="loader-status"
+        ></div>
+    </div>
+</div>

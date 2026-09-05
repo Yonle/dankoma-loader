@@ -1,4 +1,4 @@
-#loaderOverlay {
+.loaderOverlay {
     position: fixed;
     inset: 0;
 
@@ -16,11 +16,11 @@
     font-family: system-ui, sans-serif;
 }
 
-#loaderOverlay[hidden] {
+.loaderOverlay[hidden] {
     display: none;
 }
 
-#loader {
+.loader {
     width: min(520px, 100%);
 
     padding: 24px;
@@ -36,7 +36,7 @@
         0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
-#loader h2 {
+.loader h2 {
     margin: 0 0 20px;
 }
 
@@ -146,22 +146,19 @@
     color: white;
 
     cursor: pointer;
-}
-
-#loadButton {
-    background: #00aeec;
-}
-
-#loadButton:hover {
-    background: #009bd3;
-}
-
-#cancelButton {
     background: #333;
 }
 
-#cancelButton:hover {
+.loader-actions button:hover {
     background: #444;
+}
+
+.loader-actions .buttonh {
+    background: #00aeec;
+}
+
+.loader-actions .buttonh:hover {
+    background: #009bd3;
 }
 
 .loader-actions button:disabled {
