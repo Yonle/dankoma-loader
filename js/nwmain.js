@@ -46,16 +46,35 @@ async function findDanmakuFile(videoPath) {
     return null;
 }
 
+function resolveArgumentPath(value) {
+    if (path.isAbsolute(value)) {
+        return value;
+    }
+
+    const cwd =
+        process.platform === "win32"
+            ? process.cwd()
+            : process.env.PWD || process.cwd();
+
+    return path.resolve(
+        cwd,
+        value,
+    );
+}
+
 async function loadArguments(args) {
     if (!args.length) {
         openLoader();
         return;
     }
 
-    const [
+    let [
         videoPath,
         ...danmakuPaths
     ] = args;
+
+    videoPath = resolveArgumentPath(videoPath);
+    danmakuPaths = danmakuPaths.map(resolveArgumentPath);
 
     if (danmakuPaths.length) {
         try {
