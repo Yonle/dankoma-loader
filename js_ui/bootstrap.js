@@ -58,7 +58,6 @@ async function main() {
         : "https://cdn.jsdelivr.net/npm/dankoma.js@0.1.3";
 
     await loadScript(dankoma);
-    await import("./web_samples.js");
     await import("./videocontrol.js");
     await import("./settings_ui.js");
     await import("./keybind.js");
@@ -69,6 +68,8 @@ async function main() {
         await import("./converterUI.js")
         return
     }
+
+    await import("./web_samples.js");
 
     const { openLoader } = await import("./nwloader.js");
     openLoader()

@@ -1,6 +1,8 @@
 import { load, video } from "../js/player.js";
 import { samples } from "./samples.js";
 
+document.querySelector("#samples").hidden = false;
+
 const sampleList = document.querySelector("#sampleList");
 const overlay = document.querySelector("#loaderOverlay");
 const status = document.querySelector("#loaderStatus");
