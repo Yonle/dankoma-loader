@@ -21,7 +21,7 @@ function loadScript(src) {
 async function main() {
     const dankoma = isNW
         ? "../modules/dankoma.js/js/dankoma.js"
-        : "https://cdn.jsdelivr.net/npm/dankoma.js@0.1.4";
+        : "https://cdn.jsdelivr.net/npm/dankoma.js@0.1.5";
 
     await loadScript(dankoma);
     await import("./videocontrol.js");
